@@ -4,7 +4,7 @@ A VR tabletop sandbox for Meta Quest 2, Quest 3, and Quest 3S using the supplied
 
 ## Download
 
-[Download Tabletop-Lab-VR.apk](https://github.com/markovandermerwe549-ops/testincredibus/releases/download/v1.0.0/Tabletop-Lab-VR.apk) (about 84 MiB).
+[Download Tabletop-Lab-VR.apk](https://github.com/markovandermerwe549-ops/testincredibus/raw/refs/heads/main/Tabletop-Lab-VR.apk) (about 84 MiB).
 
 ## Install
 
