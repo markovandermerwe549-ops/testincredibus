@@ -1,40 +1,51 @@
-# Tabletop Lab VR
+# VR ADB Executor
 
-A VR tabletop sandbox for Meta Quest 2, Quest 3, and Quest 3S using the supplied Blender models. Touch controllers appear as cyan and orange ball hands.
+A small Android app for Meta Quest (and any Android device) that connects to **wireless ADB** and runs shell commands from a normal 2D panel. It shows up in your app library like any other app.
 
 ## Download
 
-[Download Tabletop-Lab-VR.apk](https://github.com/markovandermerwe549-ops/testincredibus/raw/refs/heads/main/Tabletop-Lab-VR.apk) (about 84 MiB).
+[Download VR-ADB-Executor.apk](https://github.com/markovandermerwe549-ops/testincredibus/raw/refs/heads/claude/wireless-adb-vr-apk-w001ee/VR-ADB-Executor.apk) (about 29 KB)
 
-## Install
+## Install on Quest
 
-Enable Quest Developer Mode, connect the headset over USB, and accept USB debugging. Install the APK with SideQuest, or run:
+1. Turn on Developer Mode for the headset in the Meta Horizon phone app.
+2. Plug the headset into a PC and run:
+   ```sh
+   adb install -r VR-ADB-Executor.apk
+   adb tcpip 5555
+   ```
+   (Or install with SideQuest.)
+3. In the headset open **Library → Unknown Sources → VR ADB Executor**.
+
+`adb tcpip 5555` turns on wireless ADB. You have to run it again after the headset restarts.
+
+## Use
+
+- **Connect**: type the IP address and port (default `5555`). Press **This headset** to control the Quest itself (`127.0.0.1`). To control another device, type its Wi-Fi IP address.
+- The first time, an **Allow debugging?** prompt appears on the target. Tick **Always allow** and accept it.
+- Type a shell command and press **Execute**. While a long command such as `logcat` runs, the button changes to **Stop**.
+- **Undo / Redo** step backward and forward through your edits in the command box.
+- **Clear command** empties the command box. **Clear** empties the output.
+- Quick buttons fill in common commands: model, battery, installed apps, IP address, storage, top, and uptime.
+
+## Limits
+
+- Only classic ADB over TCP (`adb tcpip`) is supported. The Android 11+ **Wireless debugging** pairing code flow is not supported.
+- Commands run as the ADB `shell` user, with the same permissions as `adb shell` from a PC.
+- Tested against a simulated adbd. The key and signature format were checked against the official `adb` tool. It has not been tested on a physical headset.
+
+## Build
+
+On Ubuntu:
 
 ```sh
-adb install -r Tabletop-Lab-VR.apk
+sudo apt install aapt apksigner zipalign dalvik-exchange android-sdk-platform-23 default-jdk
+./build.sh
 ```
 
-Launch **Tabletop Lab VR** from the headset's **Unknown Sources** library filter.
+The source is plain Java with no libraries:
+- `app/src/com/vradb/executor/AdbConnection.java`: ADB protocol (connect, RSA authentication, shell)
+- `app/src/com/vradb/executor/AdbKey.java`: the app's ADB key
+- `app/src/com/vradb/executor/MainActivity.java`: the UI
 
-## Controls
-
-- Move either ball hand close to a model and hold **Grip** to pick it up.
-- Release **Grip** to drop; move your hand while releasing to throw.
-- **A / X:** reset all four props to the table.
-- **B / Y:** recenter your position and facing relative to the table.
-
-Uses Touch controllers; bare-hand tracking is not implemented.
-
-## Build information
-
-- Android package: `com.tabletoplab.vr`, version `1.0`.
-- ARM64, Meta OpenXR, development-signed sideload APK.
-- All four supplied Blender files are represented, including the `.blend1` backup.
-- Local rendering and automated physics checks passed for collisions, pickup, exclusive ownership, hand following, release, throwing, and resets.
-- The APK signature was verified. Testing on a physical Quest headset has not been performed.
-
-SHA-256:
-
-```text
-e883163b7db40a1b0329e65a07c743dfb5d6e64db4621ce188a91e04ad63cfeb
-```
+`debug.keystore` signs the APK so that new builds install over old ones. Its password is `android`.
